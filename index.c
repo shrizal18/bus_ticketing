@@ -12,6 +12,7 @@ int passeneger();
 
 int main (){
     char user[10], pass[10];
+    system("cls");
     printf("Enter username : ");
     scanf("%s",user);
     printf("Enter password : ");
@@ -125,6 +126,15 @@ int remove_bus(){
     FILE *fp;
     FILE *fp1;
     int count=0;
+    fp=fopen("bus.txt","r");
+    printf("  \t\t\t---Available BUS--- \n\n");
+	printf(" BUS number\tPickup\t\tDrop\t  Available Seats\t Deaprture time");
+	printf("\n_____________________________________________________________________________\n");
+	while((fscanf(fp,"%s\t%s\t%s\t%d\t%d",&num,&pick,&drop,&seat,&time1))!=EOF){
+		printf("   %s  \t%s      %s       %d   \t   \t     %d\n" , num,pick, drop,seat,time1);
+                
+	} 
+    fclose(fp);
     printf("Enter the Bus no to remove : ");
     scanf("%s",bus_num);
     fp=fopen("bus.txt","r");
@@ -145,6 +155,7 @@ int remove_bus(){
         fclose(fp);
         fclose(fp1);
         remove("bus.txt");
+        remove(bus_num);
         rename("buscha.txt","bus.txt"); 
         printf("\nBus removed Successsfully ");
         printf("\nEnter any key to redirect to dashboard ");
@@ -207,13 +218,86 @@ int passeneger(){
                 printf("Bus not found");
                 }
             }
-            
-            
-        
-    
 }
 
 int client(){
 
-    printf("CLINET HERE");
-}
+    char choice[10];
+    FILE* fp;
+    FILE *fp1;
+    int snum;
+    char num[10],pick[10],drop[10];
+    char name[10],con1,con2;
+    int seat,time1;
+        system("cls");
+        fp=fopen("bus.txt","r");
+            rewind(fp);
+            printf("  \t\t\t---Available BUS--- \n\n");
+	        printf(" BUS number\tPickup\t\tDrop\t  Available Seats\t Deaprture time");
+	        printf("\n_____________________________________________________________________________\n");
+	        while((fscanf(fp,"%s\t%s\t%s\t%d\t%d",&num,&pick,&drop,&seat,&time1))!=EOF){
+		        printf("   %s  \t%s      %s       %d   \t   \t     %d\n" , num,pick, drop,seat,time1);
+                
+	        } 
+            fclose(fp);
+            printf("\n Enter bus number : ");
+            scanf("%s",choice);
+            fp=fopen("bus.txt","r");
+            while((fscanf(fp,"%s\t%s\t%s\t%d\t%d",&num,&pick,&drop,&seat,&time1))!=EOF){ 
+            if(strcmp(choice, num) == 0){
+                fp1=fopen(choice, "a");
+                if(fp1== NULL){
+                    fp1=fopen(choice, "w");
+                    printf("Enter your name : ");
+                    scanf("%s",name);
+                    printf("Enter your seat number : ");
+                    scanf("%d",&snum);
+                    system("cls");
+                    printf("Name = %s \nSeat number = %d",name,snum);
+                    printf("\nPress y to confirm : ");
+                    con1=getche();
+                    if(con1=='y'){
+                    fprintf(fp1,"\n%s\t%s\t%s\t%d\n",&name,&pick,&drop,&snum);
+                    fclose(fp1);
+                    printf("\nTo get more ticket press y and any other key to exit : ");
+                    con2=getche();
+                    if(con2=='y'){
+                        client();}
+                    else{
+                        system("cls");
+                        printf("\n\n\n   -----Thank you-----");
+                    }
+                
+                fclose(fp1);  
+                }}
+                else{
+                    printf("Enter your name : ");
+                    scanf("%s",name);
+                    printf("Enter your seat number : ");
+                    scanf("%d",&snum);
+                    system("cls");
+                    printf("Name = %s \nSeat number = %d",name,snum);
+                    printf("\nPress y to confirm : ");
+                    con1=getche();
+                    if(con1=='y'){
+                    fprintf(fp1,"\n%s\t%s\t%s\t%d\n",&name,&pick,&drop,&snum);
+                    fclose(fp1);
+                    printf("\nTo get more ticket press y and any other key to exit : ");
+                    con2=getche();
+                    if(con2=='y'){
+                        client();}
+                    else{
+                        system("cls");
+                        printf("\n\n\n   -----Thank you-----\n\n\n");
+                    }
+                    }
+                    else
+                        client();
+            }}
+            else{
+                system("cls");
+                printf("Bus not found");
+                }
+            }
+        }
+    

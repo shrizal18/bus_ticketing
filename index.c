@@ -38,10 +38,10 @@ int admin(){
             choice = getche();
 	    }
         else{
+            rewind(fp);
             printf("  \t\t\t---Available BUS--- \n\n");
 	        printf(" BUS number\tPickup\t\tDrop\t  Available Seats\t Deaprture time");
 	        printf("\n_____________________________________________________________________________\n");
-            printf("   %s  \t%s      %s       %d   \t   \t     %d\n" , num,pick, drop,seat,time1);
 	        while((fscanf(fp,"%s\t%s\t%s\t%d\t%d",&num,&pick,&drop,&seat,&time1))!=EOF){
 		        printf("   %s  \t%s      %s       %d   \t   \t     %d\n" , num,pick, drop,seat,time1);
                 
@@ -161,7 +161,56 @@ int remove_bus(){
 }
 
 int passeneger(){
-    printf("passenger details here ");
+
+    char choice[10];
+    FILE* fp;
+    FILE *fp1;
+    char num[10],pick[10],drop[10];
+    char name[10];
+    int seat,time1;
+        system("cls");
+        fp=fopen("bus.txt","r");
+            rewind(fp);
+            printf("  \t\t\t---Available BUS--- \n\n");
+	        printf(" BUS number\tPickup\t\tDrop\t  Available Seats\t Deaprture time");
+	        printf("\n_____________________________________________________________________________\n");
+	        while((fscanf(fp,"%s\t%s\t%s\t%d\t%d",&num,&pick,&drop,&seat,&time1))!=EOF){
+		        printf("   %s  \t%s      %s       %d   \t   \t     %d\n" , num,pick, drop,seat,time1);
+                
+	        } 
+            fclose(fp);
+            printf("\n Press bus number to see passenger details : ");
+            scanf("%s",choice);
+            fp=fopen("bus.txt","r");
+            while((fscanf(fp,"%s\t%s\t%s\t%d\t%d",&num,&pick,&drop,&seat,&time1))!=EOF){ 
+            if(strcmp(choice, num) == 0){
+                fp1=fopen(choice, "r");
+                if(fp1 == NULL){
+                    system("cls");
+                printf("\n\n\n");
+                printf("  \t\t\t---NO PASSENGERs IN THE BUS--- \n\n");
+                getch();
+                }
+                else{
+                    rewind(fp1);
+                    system("cls");
+                    printf("  \t\t\t---PASSENGERS--- \n\n");
+	                printf(" Name\tPickup\t\tDrop\t  Seat Numebr");
+	                printf("\n_____________________________________________________________________________\n");
+	                while((fscanf(fp1,"%s\t%s\t%s\t%d",&name,&pick,&drop,&seat))!=EOF){
+		                printf("   %s  \t%s      %s       %d   \t   \t     \n" , name,pick, drop,seat);
+                    }
+	        } 
+            fclose(fp1);
+            }
+            else{
+                printf("Bus not found");
+                }
+            }
+            
+            
+        
+    
 }
 
 int client(){

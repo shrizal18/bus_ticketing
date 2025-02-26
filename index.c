@@ -1,303 +1,339 @@
 #include<stdio.h>
 #include<stdlib.h>
-#include<conio.h>
 #include<string.h>
+#include<conio.h>
 
-int admin();
-int client();
-int add_bus();
-int remove_bus();
-int passeneger();
+// Structure for Bus details
+struct Bus{
+    char num[10];
+    char pick[20];
+    char drop[20];
+    int seat;
+    int time1;
+};
 
+// Structure for Passenger details
+struct Passenger{
+    char name[20];
+    int seatNumber;
+};
 
-int main (){
-    char user[10], pass[10];
+// Function declarations
+void login();
+void view_buses();
+void admin_menu();
+void add_bus();
+void remove_bus();
+void view_passengers();
+void client_menu();
+void book_ticket();
+void cancel_ticket();
+void update_seat_count(char *bus_num, int change);
+void exit_program();
+
+int main(){
+    login();
+    return  0;
+}
+
+// Login Function
+void login(){
     system("cls");
-    printf("Enter username : ");
-    scanf("%s",user);
-    printf("Enter password : ");
-    scanf("%s",pass);
-    if(strcmp(user,"admin")==0 && strcmp(pass,"admin")==0)
-        admin();
-    else
-        client();
-
-}
-
-int admin(){
-    char choice;
-    FILE* fp;
-    char num[10],pick[10],drop[10];
-    int seat,time1;
+    char user[20], pass[20];
+    printf("Enter username: ");
+    scanf("%s", user);
+    printf("Enter password: ");
+    scanf("%s", pass);
     
-    do{
-        system("cls");
-        fp=fopen("bus.txt","r");
-        if((fscanf(fp,"%s%s%s%d%d",&num,&pick,&drop,&seat,&time1))==EOF){
-		    printf("  ---NO BUS Available--- ");
-            printf("\n To add buses press 'a' :  ");
-            choice = getche();
-	    }
-        else{
-            rewind(fp);
-            printf("  \t\t\t---Available BUS--- \n\n");
-	        printf(" BUS number\tPickup\t\tDrop\t  Available Seats\t Deaprture time");
-	        printf("\n_____________________________________________________________________________\n");
-	        while((fscanf(fp,"%s\t%s\t%s\t%d\t%d",&num,&pick,&drop,&seat,&time1))!=EOF){
-		        printf("   %s  \t%s      %s       %d   \t   \t     %d\n" , num,pick, drop,seat,time1);
-                
-	        } 
-            printf("\n Press 'a' to add , 'r' to remove bus and 'p' to view passenger's details : ");
-            choice=getche();
-            fclose(fp);
-        }
-        
-}
-    while(choice!='a' && choice!='r' && choice!='p' );
-    
-    if (choice=='a'){
-        add_bus();
+    if (strcmp(user, "admin") == 0 && strcmp(pass, "admin") == 0) {
+        admin_menu();
+    } else {
+        client_menu();
     }
-    else if(choice=='r'){
-        remove_bus();
+}
+
+// View Available Buses
+void view_buses(){
+    system("cls");
+    FILE *fp = fopen("bus.txt", "r");
+    if (!fp) {
+        printf("No buses available!\n");
+        exit_program();
+    }
+    
+    struct Bus bus;
+    printf("Bus Number\tPickup\tDrop\tSeats\tTime\n");
+    printf("------------------------------------------------\n");
+    while (fscanf(fp, "%s %s %s %d %d", bus.num, bus.pick, bus.drop, &bus.seat, &bus.time1) != EOF) {
+        printf("%s\t%s\t%s\t%d\t%d\n", bus.num, bus.pick, bus.drop, bus.seat, bus.time1);
+    }
+    fclose(fp);
+}
+
+// Admin Menu
+void admin_menu(){
+    struct Bus bus;
+    int choice,con1;
+    system("cls");
+    FILE *fp = fopen("bus.txt", "r");
+    if (!fp) {
+        printf("\t\tNo buses available!\n\n");
+        printf("Enter 1 to add bus : ");
+        scanf("%d",&con1);
+        if(con1==1)
+            add_bus();
+        else
+            exit_program();
+        
     }
     else{
-        passeneger();
+    system("cls");
+    rewind(fp);
+    printf("Bus Number\tPickup\tDrop\tSeats\tTime\n");
+    printf("------------------------------------------------\n");
+    while (fscanf(fp, "%s %s %s %d %d", bus.num, bus.pick, bus.drop, &bus.seat, &bus.time1) != EOF) {
+        printf("%s\t%s\t%s\t%d\t%d\n", bus.num, bus.pick, bus.drop, bus.seat, bus.time1);
     }
+    
+    
+        printf("\n1. Add Bus\n2. Remove Bus\n3. View Passengers\n4. Exit\nEnter choice: ");
+        scanf("%d", &choice);
+        
+        switch (choice) {
+            case 1: add_bus(); break;
+            case 2: remove_bus(); break;
+            case 3: view_passengers(); break;
+            default: exit_program();
+        }
+    }
+    fclose(fp);
 }
 
-int add_bus(){
 
-    char num[10],pick[10],drop[10];
-    int seat,time1;
-    FILE *fp;
-    char choice, con, con1;
-    char red;
-    do{
-        system("cls");
-        fp=fopen("bus.txt","a");
-        printf("Enter bus number : ");
-        scanf("%s",num);
-        printf("Enter pickup location : ");
-        scanf("%s",pick);
-        printf("Enter drop location : ");
-        scanf("%s",drop);
-        printf("Enter no of seats : ");
-        scanf("%d",&seat);
-        printf("Enter bus depature timing : ");
-        scanf("%d",&time1);
-        system("cls");
-        printf("Bus Number : %s \n PickUp/Drop : %s/%s \n No of seats : %d\n Deaprture time : %d", num,pick,drop,seat,time1);
-        printf("\n\nConfirm to add bus of following details :(y for yes n for no ) : ");
-        con=getche();
-        if (con =='y'){
-            fprintf(fp,"\n%s\t%s\t%s\t%d\t%d\n",num,pick,drop,seat,time1);
-            printf("\nBus added successfully ");
-            fclose(fp);
-        }
-        else{
-            system("cls");
-            printf("\nIf you want to edit details press y if not press any keys to rediret to dashboard : ");
-            con1=getche();
-            if(con1 =='y'){
-                    add_bus();
-            }
-            else{
-                admin();
-            }
-        }
-        printf("\nPress 'y' to add more bus : ");
-        choice= getche();
+// Add Bus
+void add_bus(){
+    system("cls");
+    FILE *fp = fopen("bus.txt", "a");
+    if (!fp) {
+        printf("Error opening file!\n");
+        printf("Press any key to return to dashboard !!");
+        getch();
+        admin_menu();
     }
-    while(choice=='y');
-    printf("\nEnter any keys to go to the dashboard  ") ; 
+    
+    struct Bus bus;
+    printf("Enter bus number: ");
+    scanf("%s", bus.num);
+    printf("Enter pickup location: ");
+    scanf("%s", bus.pick);
+    printf("Enter drop location: ");
+    scanf("%s", bus.drop);
+    printf("Enter no of seats: ");
+    scanf("%d", &bus.seat);
+    printf("Enter bus departure time: ");
+    scanf("%d", &bus.time1);
+    
+    fprintf(fp, "%s %s %s %d %d\n", bus.num, bus.pick, bus.drop, bus.seat, bus.time1);
+    fclose(fp);
+    printf("Bus added successfully!\n");
+    printf("Press any key to return to dashboard !!");
     getch();
-    admin();
+    admin_menu();
+}
+
+// Remove Bus
+void remove_bus(){
+    system("cls");
+    int found=1;
+    char bus_num[10];
+    struct Bus bus;
+    FILE *fp = fopen("bus.txt", "r");
+    FILE *temp = fopen("temp.txt", "w");
+    printf("Enter bus number : ");
+    scanf("%s",bus_num);
+    
+    while (fscanf(fp, "%s %s %s %d %d", bus.num, bus.pick, bus.drop, &bus.seat, &bus.time1) != EOF) {
+        if (strcmp(bus.num, bus_num) == 0) {
+            found=1;
+        }
+        fprintf(temp, "%s %s %s %d %d\n", bus.num, bus.pick, bus.drop, bus.seat, bus.time1);
+    }
+    fclose(fp);
+    fclose(temp);
+    
+    if (remove("bus.txt") != 0) {
+        perror("Error deleting original file");
+    } else if (rename("temp.txt", "bus.txt") != 0) {
+        perror("Error renaming temporary file");
+    } else {
+        if (found) {
+            printf("Bus removed successfully!\n");
+        } else {
+            printf("Bus not found!\n");
+        }
+    }
+
 }
 
 
-
-
-int remove_bus(){
+// View Passengers
+void view_passengers(){
     system("cls");
     char bus_num[10];
-    char num[10],pick[10],drop[10];
-    int seat,time1;
-    FILE *fp;
-    FILE *fp1;
-    int count=0;
-    fp=fopen("bus.txt","r");
-    printf("  \t\t\t---Available BUS--- \n\n");
-	printf(" BUS number\tPickup\t\tDrop\t  Available Seats\t Deaprture time");
-	printf("\n_____________________________________________________________________________\n");
-	while((fscanf(fp,"%s\t%s\t%s\t%d\t%d",&num,&pick,&drop,&seat,&time1))!=EOF){
-		printf("   %s  \t%s      %s       %d   \t   \t     %d\n" , num,pick, drop,seat,time1);
-                
-	} 
+    printf("Enter bus number to view passengers: ");
+    scanf("%s", bus_num);
+    
+    char filename[20];
+    sprintf(filename, "bus_%s.txt", bus_num);
+    FILE *fp = fopen(filename, "r");
+    if (!fp) {
+        printf("No passengers found!\n");
+        exit_program();
+    }
+    
+    struct Passenger p;
+    printf("Passenger Name\tSeat Number\n");
+    printf("-------------------------------\n");
+    while (fscanf(fp, "%s %d", p.name, &p.seatNumber) != EOF) {
+        printf("%s\t%d\n", p.name, p.seatNumber);
+    }
     fclose(fp);
-    printf("Enter the Bus no to remove : ");
-    scanf("%s",bus_num);
-    fp=fopen("bus.txt","r");
-     while((fscanf(fp,"%s\n",&num))!=EOF){
-        if(strcmp(bus_num,num)==0){
-            count++;
-        }       
-	}
+    printf("Enter any key to return to dashboard !!");
+    getch();
+    admin_menu();
+}
+
+// Client Menu
+void client_menu(){
+    system("cls");
+    int choice;
+    struct Bus bus;
+    FILE *fp = fopen("bus.txt", "r");
+    if (!fp) {
+        printf("No buses available!\n");
+        exit_program();
+    }
+    
+    
+    printf("Bus Number\tPickup\tDrop\tSeats\tTime\n");
+    printf("------------------------------------------------\n");
+    while (fscanf(fp, "%s %s %s %d %d", bus.num, bus.pick, bus.drop, &bus.seat, &bus.time1) != EOF) {
+        printf("%s\t%s\t%s\t%d\t%d\n", bus.num, bus.pick, bus.drop, bus.seat, bus.time1);
+    }
     fclose(fp);
-    fp=fopen("bus.txt","r");
-    if(count==1){
-        fp1=fopen("buscha.txt","w");
-        while((fscanf(fp,"%s\t%s\t%s\t%d\t%d\n",&num,&pick,&drop,&seat,&time1))!=EOF){
-            if(strcmp(bus_num,num)!=0){
-                fprintf(fp1,"%s\t%s\t%s\t%d\t%d\n",num,pick,drop,seat,time1);
-            }       
-	    }
-        fclose(fp);
-        fclose(fp1);
-        remove("bus.txt");
-        remove(bus_num);
-        rename("buscha.txt","bus.txt"); 
-        printf("\nBus removed Successsfully ");
-        printf("\nEnter any key to redirect to dashboard ");
-        getch();
-        admin();
+    
+   
+        printf("\n1. Book Ticket\n2. Cancel Ticket\n3. Exit\nEnter choice: ");
+        scanf("%d", &choice);
+        
+        switch (choice) {
+            case 1: book_ticket(); break;
+            case 2: cancel_ticket(); break;
+            default: exit_program();
+        }
+}
+
+// Book Ticket
+void book_ticket(){
+    system("cls");
+     struct Bus bus;
+    char bus_num[10];
+    char filename[20];
+    int found=0;
+    printf("Enter bus number to book a ticket: ");
+    scanf("%s", bus_num);
+    FILE* fp1= fopen("bus.txt","r+");
+    while (fscanf(fp1, "%s %s %s %d %d", bus.num, bus.pick, bus.drop, &bus.seat, &bus.time1) != EOF) {
+        if (strcmp(bus.num, bus_num) == 0) {
+            found = 1;
+        }
+    }
+    if(found==1){
+    update_seat_count(bus_num, -1);
+
+    
+    sprintf(filename, "bus_%s.txt", bus_num);
+    FILE *fp = fopen(filename, "a");
+    
+    struct Passenger p;
+    printf("Enter passenger name: ");
+    scanf("%s", p.name);
+    printf("Enter seat number: ");
+    scanf("%d", &p.seatNumber);
+    
+    fprintf(fp, "%s %d\n", p.name, p.seatNumber);
+    fclose(fp);
+    printf("Ticket booked successfully!\n");
     }
     else{
-        system("cls");
-        printf(" Bus not found  ");
-        printf("\n Press any key to see dashboard ");
+        printf("Bus not found ");
+        printf("Enter any key to go to dashboard !!");
         getch();
-        admin();
     }
 }
 
-int passeneger(){
-
-    char choice[10];
-    FILE* fp;
-    FILE *fp1;
-    char num[10],pick[10],drop[10];
-    char name[10];
-    int seat,time1;
-        system("cls");
-        fp=fopen("bus.txt","r");
-            rewind(fp);
-            printf("  \t\t\t---Available BUS--- \n\n");
-	        printf(" BUS number\tPickup\t\tDrop\t  Available Seats\t Deaprture time");
-	        printf("\n_____________________________________________________________________________\n");
-	        while((fscanf(fp,"%s\t%s\t%s\t%d\t%d",&num,&pick,&drop,&seat,&time1))!=EOF){
-		        printf("   %s  \t%s      %s       %d   \t   \t     %d\n" , num,pick, drop,seat,time1);
-                
-	        } 
-            fclose(fp);
-            printf("\n Press bus number to see passenger details : ");
-            scanf("%s",choice);
-            fp=fopen("bus.txt","r");
-            while((fscanf(fp,"%s\t%s\t%s\t%d\t%d",&num,&pick,&drop,&seat,&time1))!=EOF){ 
-            if(strcmp(choice, num) == 0){
-                fp1=fopen(choice, "r");
-                if(fp1 == NULL){
-                    system("cls");
-                printf("\n\n\n");
-                printf("  \t\t\t---NO PASSENGERs IN THE BUS--- \n\n");
-                getch();
-                }
-                else{
-                    rewind(fp1);
-                    system("cls");
-                    printf("  \t\t\t---PASSENGERS--- \n\n");
-	                printf(" Name\tPickup\t\tDrop\t  Seat Numebr");
-	                printf("\n_____________________________________________________________________________\n");
-	                while((fscanf(fp1,"%s\t%s\t%s\t%d",&name,&pick,&drop,&seat))!=EOF){
-		                printf("   %s  \t%s      %s       %d   \t   \t     \n" , name,pick, drop,seat);
-                    }
-	        } 
-            fclose(fp1);
-            }
-            else{
-                printf("Bus not found");
-                }
-            }
+// Cancel Ticket
+void cancel_ticket(){
+    system("cls");
+    char bus_num[10], passenger_name[20];
+    printf("Enter bus number: ");
+    scanf("%s", bus_num);
+    printf("Enter passenger name: ");
+    scanf("%s", passenger_name);
+    
+    char filename[20];
+    sprintf(filename, "bus_%s.txt", bus_num);
+    FILE *fp = fopen(filename, "r");
+    FILE *temp = fopen("temp.txt", "w");
+    
+    struct Passenger p;
+    int found = 0;
+    while (fscanf(fp, "%s %d", p.name, &p.seatNumber) != EOF) {
+        if (strcmp(p.name, passenger_name) == 0) {
+            found = 1;
+        } else {
+            fprintf(temp, "%s %d\n", p.name, p.seatNumber);
+        }
+    }
+    fclose(fp);
+    fclose(temp);
+    
+    remove(filename);
+    rename("temp.txt", filename);
+    
+    if (found) {
+        update_seat_count(bus_num, 1);
+        printf("Ticket canceled successfully!\n");
+    } else {
+        printf("Passenger not found!\n");
+    }
 }
 
-int client(){
-
-    char choice[10];
-    FILE* fp;
-    FILE *fp1;
-    int snum;
-    char num[10],pick[10],drop[10];
-    char name[10],con1,con2;
-    int seat,time1;
-        system("cls");
-        fp=fopen("bus.txt","r");
-            rewind(fp);
-            printf("  \t\t\t---Available BUS--- \n\n");
-	        printf(" BUS number\tPickup\t\tDrop\t  Available Seats\t Deaprture time");
-	        printf("\n_____________________________________________________________________________\n");
-	        while((fscanf(fp,"%s\t%s\t%s\t%d\t%d",&num,&pick,&drop,&seat,&time1))!=EOF){
-		        printf("   %s  \t%s      %s       %d   \t   \t     %d\n" , num,pick, drop,seat,time1);
-                
-	        } 
-            fclose(fp);
-            printf("\n Enter bus number : ");
-            scanf("%s",choice);
-            fp=fopen("bus.txt","r");
-            while((fscanf(fp,"%s\t%s\t%s\t%d\t%d",&num,&pick,&drop,&seat,&time1))!=EOF){ 
-            if(strcmp(choice, num) == 0){
-                fp1=fopen(choice, "a");
-                if(fp1== NULL){
-                    fp1=fopen(choice, "w");
-                    printf("Enter your name : ");
-                    scanf("%s",name);
-                    printf("Enter your seat number : ");
-                    scanf("%d",&snum);
-                    system("cls");
-                    printf("Name = %s \nSeat number = %d",name,snum);
-                    printf("\nPress y to confirm : ");
-                    con1=getche();
-                    if(con1=='y'){
-                    fprintf(fp1,"\n%s\t%s\t%s\t%d\n",&name,&pick,&drop,&snum);
-                    fclose(fp1);
-                    printf("\nTo get more ticket press y and any other key to exit : ");
-                    con2=getche();
-                    if(con2=='y'){
-                        client();}
-                    else{
-                        system("cls");
-                        printf("\n\n\n   -----Thank you-----");
-                    }
-                
-                fclose(fp1);  
-                }}
-                else{
-                    printf("Enter your name : ");
-                    scanf("%s",name);
-                    printf("Enter your seat number : ");
-                    scanf("%d",&snum);
-                    system("cls");
-                    printf("Name = %s \nSeat number = %d",name,snum);
-                    printf("\nPress y to confirm : ");
-                    con1=getche();
-                    if(con1=='y'){
-                    fprintf(fp1,"\n%s\t%s\t%s\t%d\n",&name,&pick,&drop,&snum);
-                    fclose(fp1);
-                    printf("\nTo get more ticket press y and any other key to exit : ");
-                    con2=getche();
-                    if(con2=='y'){
-                        client();}
-                    else{
-                        system("cls");
-                        printf("\n\n\n   -----Thank you-----\n\n\n");
-                    }
-                    }
-                    else
-                        client();
-            }}
-            else{
-                system("cls");
-                printf("Bus not found");
-                }
-            }
-        }
+// Update Seat Count
+void update_seat_count(char *bus_num, int change){
+    system("cls");
+    struct Bus bus;
+    FILE *fp = fopen("bus.txt", "r");
+    FILE *temp = fopen("temp.txt", "w");
     
+    
+    while (fscanf(fp, "%s %s %s %d %d", bus.num, bus.pick, bus.drop, &bus.seat, &bus.time1) != EOF) {
+        if (strcmp(bus.num, bus_num) == 0) {
+            bus.seat += change;
+        }
+        fprintf(temp, "%s %s %s %d %d\n", bus.num, bus.pick, bus.drop, bus.seat, bus.time1);
+    }
+    fclose(fp);
+    fclose(temp);
+    
+    remove("bus.txt");
+    rename("temp.txt", "bus.txt");
+}
+
+void exit_program(){
+    system("cls");
+    printf("Enter any key to exit !!");
+    getch();
+    system("cls");
+    printf("Exiting the system...\n");
+}
